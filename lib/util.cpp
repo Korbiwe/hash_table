@@ -1,9 +1,10 @@
 //
 // Created by korbiwe on 2019-02-05.
 //
+
 #include "util.h"
 
-size_t round_up_to_the_power_of_two(size_t num) {
+extern size_t round_up_to_power_of_two(size_t num) {
     num--;
     num |=  num >> 1;
     num |=  num >> 2;
@@ -13,3 +14,4 @@ size_t round_up_to_the_power_of_two(size_t num) {
     num++;
     return num;
 }
+
