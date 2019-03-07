@@ -1,10 +1,10 @@
 #include <iostream>
-#include "lib/HashMap.hpp"
+#include "lib/HashTable.hpp"
 
 #define DEBUG
 
 int main() {
-  lib::HashMap<int, int> map;
+  lib::HashTable<int, int> map;
   for (int i = 0; i < 5000; i++) {
     map.insert({i, i + 1});
   }

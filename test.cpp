@@ -4,29 +4,29 @@
 
 #include <cassert>
 #include <iostream>
-#include "lib/HashMap.hpp"
+#include "lib/HashTable.hpp"
 
 void test_initially_empty() {
-  lib::HashMap<std::string, std::string> hm;
+  lib::HashTable<std::string, std::string> hm;
 
-  assert(hm.empty() && "HashMap must be initially empty");
-  assert(hm.size() == 0 && "HashMap must have initial size of 0"); // NOLINT(readability-container-size-empty)
+  assert(hm.empty() && "HashTable must be initially empty");
+  assert(hm.size() == 0 && "HashTable must have initial size of 0"); // NOLINT(readability-container-size-empty)
 }
 
 void test_throws_when_empty() {
-  lib::HashMap<std::string, std::string> hm;
+  lib::HashTable<std::string, std::string> hm;
 
   try {
     hm.at("smth");
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCSimplifyInspection"
-    assert(false && "Expected HashMap to throw std::out_of_range when calling HashMap::at with an invalid key");
+    assert(false && "Expected HashTable to throw std::out_of_range when calling HashTable::at with an invalid key");
 #pragma clang diagnostic pop
   } catch (std::out_of_range& e) {}
 }
 
 void test_no_value_mismatch() {
-  lib::HashMap<std::string, std::string> hm;
+  lib::HashTable<std::string, std::string> hm;
 
   for (size_t i = 0; i < 10000; i++) {
     std::string key(i, char(i % 254));
@@ -38,7 +38,7 @@ void test_no_value_mismatch() {
 }
 
 void test_bracket_default() {
-  lib::HashMap<std::string, std::string> hm;
+  lib::HashTable<std::string, std::string> hm;
 
   assert(hm["test"].empty() && "Expecting bracket operator to use the default constructor of T");
 
@@ -53,7 +53,7 @@ void test_bracket_default() {
 }
 
 void test_erase() {
-  lib::HashMap<std::string, std::string> hm;
+  lib::HashTable<std::string, std::string> hm;
 
   hm.insert({ "test", "test" });
 

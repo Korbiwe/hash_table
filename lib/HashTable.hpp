@@ -1,9 +1,7 @@
+#pragma once
 //
 // Created by korbiwe on 2019-02-05.
 //
-
-#ifndef HASH_TABLE_HASHMAP_H
-#define HASH_TABLE_HASHMAP_H
 
 #include <functional>
 #include <vector>
@@ -20,7 +18,7 @@ using index_t = unsigned;
 
 
 template<class Key, class T, class Hash = std::hash<T>>
-class HashMap {
+class HashTable {
 public:
   using key_t = Key;
   using mapped_t = T;
@@ -30,13 +28,13 @@ public:
   using reference = pair_t&;
   using const_reference = const pair_t&;
 
-  explicit HashMap(size_t capacity = 8, double load_factor = 0.75);
+  explicit HashTable(size_t capacity = 8, double load_factor = 0.75);
 
-  T& at(const key_t& key);
+  T& at(const Key& key);
 
-  T& operator[](const key_t& key);
+  T& operator[](const Key& key);
 
-  void erase(key_t&& key);
+  void erase(const Key& key);
 
   void insert(const pair_t& pair);
 
@@ -59,7 +57,7 @@ private:
 };
 
 template<class Key, class T, class Hash>
-HashMap<Key, T, Hash>::HashMap(size_t capacity, double load_factor) :
+HashTable<Key, T, Hash>::HashTable(size_t capacity, double load_factor) :
     _capacity(round_up_to_power_of_two(capacity)),
     _load_factor(load_factor),
     _table(table_t(_capacity)) {
@@ -67,7 +65,7 @@ HashMap<Key, T, Hash>::HashMap(size_t capacity, double load_factor) :
 }
 
 template<class Key, class T, class Hash>
-void HashMap<Key, T, Hash>::insert(const HashMap::pair_t& pair) {
+void HashTable<Key, T, Hash>::insert(const HashTable::pair_t& pair) {
   Key key = pair.first;
   T value = pair.second;
 
@@ -82,20 +80,20 @@ void HashMap<Key, T, Hash>::insert(const HashMap::pair_t& pair) {
 }
 
 template<class Key, class T, class Hash>
-T& HashMap<Key, T, Hash>::at(const Key& key) {
+T& HashTable<Key, T, Hash>::at(const Key& key) {
   bucket_t& bucket = _resolve_key(key);
 #ifdef DEBUG
   std::cout << "Lookup in a bucket with " << std::to_string(bucket.size()) << " elements.";
 #endif
   auto found = std::find_if(bucket.begin(), bucket.end(), [&key](pair_t pair) { return pair.first == key; });
   if (bucket.empty() || found == bucket.end()) {
-    throw std::out_of_range("HashMap::at");
+    throw std::out_of_range("HashTable::at");
   }
   return found->second;
 }
 
 template<class Key, class T, class Hash>
-void HashMap<Key, T, Hash>::_expand_and_rehash() {
+void HashTable<Key, T, Hash>::_expand_and_rehash() {
 #ifdef DEBUG
   std::cout << "Rehashing at capacity "
             << std::to_string(_capacity)
@@ -132,7 +130,7 @@ void HashMap<Key, T, Hash>::_expand_and_rehash() {
 }
 
 template<class Key, class T, class Hash>
-T& HashMap<Key, T, Hash>::operator[](const Key& key) {
+T& HashTable<Key, T, Hash>::operator[](const Key& key) {
   bucket_t& bucket = _resolve_key(key);
 #ifdef DEBUG
   std::cout << "Lookup in a bucket with " << std::to_string(bucket.size()) << " elements.";
@@ -146,35 +144,33 @@ T& HashMap<Key, T, Hash>::operator[](const Key& key) {
 }
 
 template<class Key, class T, class Hash>
-bool HashMap<Key, T, Hash>::empty() const {
+bool HashTable<Key, T, Hash>::empty() const {
   return _size == 0;
 }
 
 template<class Key, class T, class Hash>
-size_t HashMap<Key, T, Hash>::size() const {
+size_t HashTable<Key, T, Hash>::size() const {
   return _size;
 }
 
 template<class Key, class T, class Hash>
-void HashMap<Key, T, Hash>::erase(Key&& key) {
+void HashTable<Key, T, Hash>::erase(const Key& key) {
   bucket_t& bucket = _resolve_key(key);
   auto found = std::find_if(bucket.begin(), bucket.end(), [&key](const pair_t& pair) { return pair.first == key; });
   if (bucket.empty() || found == bucket.end()) {
-    throw std::out_of_range("HashMap::erase");
+    throw std::out_of_range("HashTable::erase");
   }
   bucket.erase(found);
 }
 
 template<class Key, class T, class Hash>
-const typename HashMap<Key, T, Hash>::bucket_t& HashMap<Key, T, Hash>::_resolve_key(const Key& key) const {
+const typename HashTable<Key, T, Hash>::bucket_t& HashTable<Key, T, Hash>::_resolve_key(const Key& key) const {
   return _table[_hash_f(key) % _capacity];
 }
 
 template<class Key, class T, class Hash>
-typename HashMap<Key, T, Hash>::bucket_t& HashMap<Key, T, Hash>::_resolve_key(const Key& key) {
+typename HashTable<Key, T, Hash>::bucket_t& HashTable<Key, T, Hash>::_resolve_key(const Key& key) {
   return _table[_hash_f(key) % _capacity];
 }
 
 }; // end namespace lib
-
-#endif //HASH_TABLE_HASHMAP_H
